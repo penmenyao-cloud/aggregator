@@ -1,54 +1,38 @@
 name: Process
 on:
   schedule:
-    - cron: "05 03 * * *"
-    - cron: "05 11 * * *"
+    - cron: "5 */6 * * *"
   workflow_dispatch:
-
+concurrency:
+  group: ${{ github.repository }}-process
+  cancel-in-progress: false
 env:
-  # time zone
   TZ: Asia/Shanghai
-
-  # network proxy aggregate config
-  SUBSCRIBE_CONF: ${{ secrets.SUBSCRIBE_CONF }}
-
-  # token
   PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
-
-  # not check connective
-  SKIP_ALIVE_CHECK: ${{ vars.SKIP_ALIVE_CHECK }}
-
-  # skip remark
-  SKIP_REMARK: ${{ vars.SKIP_REMARK }}
-
-  # workflow mode
-  WORKFLOW_MODE: ${{ vars.WORKFLOW_MODE }}
-
-  # include spwcial protocols, such vless hysteria2 and hysteria
-  ENABLE_SPECIAL_PROTOCOLS: ${{ vars.ENABLE_SPECIAL_PROTOCOLS }}
-
+  GH_TOKEN: ${{ secrets.PUSH_TOKEN }}
 jobs:
   process:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: main
-
       - name: Prepare
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
           architecture: "x64"
           cache: "pip"
-
       - name: Install
         run: pip3 install -r requirements.txt
-
+      - name: Check
+        run: |
+          if [ -z "$PUSH_TOKEN" ]; then
+              echo "Error: secret 'PUSH_TOKEN' cannot be empty"
+              exit 1
+          fi
       - name: Process
-        run: python -u subscribe/process.py --overwrite
-
+        run: python -u subscribe/process.py -s subscribe/config.free.json --overwrite
       - name: Timestamp
         run: date

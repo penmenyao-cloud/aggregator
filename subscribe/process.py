@@ -14,6 +14,7 @@ import time
 import traceback
 
 import executable
+import ipquality
 import location
 import pipeline
 import push
@@ -256,6 +257,15 @@ def aggregate(args: argparse.Namespace) -> None:
                 digits=max(1, group.regularize.digits),
                 score=group.regularize.score,
             )
+
+        # IP quality filter (ip.net.coffee trust_score): drop nodes whose
+        # server IP scores below QUALITY_MIN_SCORE (default 60). Lookup
+        # failures keep the node; if everything is filtered out the group
+        # is skipped so the previous subscription stays in place.
+        nochecks = ipquality.filter_proxies(proxies=nochecks, group=k)
+        if len(nochecks) <= 0:
+            logger.error(f"all proxies filtered out by IP quality check, group=[{k}], cost: {time.time()-starttime:.2f}s")
+            continue
 
         source_file, data = "config.yaml", {"proxies": nochecks}
         filepath = os.path.join(PATH, "subconverter", source_file)

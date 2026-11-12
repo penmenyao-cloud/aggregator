@@ -1,0 +1,95 @@
+{
+  "sites": [],
+  "crawl": {
+    "enable": true,
+    "exclude": "",
+    "max_fails": 5,
+    "include_nodes": true,
+    "persist": {
+      "subscribe": "crawledsubs",
+      "nodes": "crawledproxies"
+    },
+    "task": {
+      "rename": "",
+      "include": "",
+      "exclude": ""
+    },
+    "telegram": {
+      "enable": false,
+      "pages": 3,
+      "exclude": "",
+      "channels": {}
+    },
+    "google": {
+      "enable": false,
+      "exclude": "",
+      "limit": 100,
+      "days": 7,
+      "exclude_sites": [],
+      "push_to": []
+    },
+    "yandex": {
+      "enable": false,
+      "exclude": "",
+      "days": 3,
+      "pages": 5,
+      "exclude_sites": [],
+      "push_to": []
+    },
+    "github": {
+      "enable": true,
+      "pages": 2,
+      "push_to": ["free"],
+      "exclude": "",
+      "exclude_repos": []
+    },
+    "twitter": {
+      "enable": false,
+      "users": {}
+    },
+    "repositories": [],
+    "pages": [],
+    "scripts": []
+  },
+  "groups": {
+    "free": {
+      "emoji": true,
+      "list_only": false,
+      "targets": {
+        "clash": "free-clash",
+        "singbox": "free-singbox",
+        "v2ray": "free-v2ray"
+      }
+    }
+  },
+  "storage": {
+    "engine": "gist",
+    "items": {
+      "free-clash": {
+        "username": "penmenyao-cloud",
+        "gist_id": "752bc71fd89c75b288d0955e41ea4317",
+        "filename": "clash.yaml"
+      },
+      "free-singbox": {
+        "username": "penmenyao-cloud",
+        "gist_id": "752bc71fd89c75b288d0955e41ea4317",
+        "filename": "singbox.json"
+      },
+      "free-v2ray": {
+        "username": "penmenyao-cloud",
+        "gist_id": "752bc71fd89c75b288d0955e41ea4317",
+        "filename": "v2ray.txt"
+      },
+      "crawledsubs": {
+        "username": "penmenyao-cloud",
+        "gist_id": "752bc71fd89c75b288d0955e41ea4317",
+        "filename": "subs.json"
+      },
+      "crawledproxies": {
+        "username": "penmenyao-cloud",
+        "gist_id": "752bc71fd89c75b288d0955e41ea4317",
+        "filename": "proxies.json"
+      }
+    }
+  }
+}

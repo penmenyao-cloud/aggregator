@@ -10,6 +10,7 @@ env:
   TZ: Asia/Shanghai
   PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
   GH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+  QUALITY_MIN_SCORE: "60"
 jobs:
   process:
     runs-on: ubuntu-latest
@@ -26,6 +27,11 @@ jobs:
           cache: "pip"
       - name: Install
         run: pip3 install -r requirements.txt
+      - name: Restore quality cache
+        uses: actions/cache@v4
+        with:
+          path: data/quality_cache.json
+          key: quality-cache-v1
       - name: Check
         run: |
           if [ -z "$PUSH_TOKEN" ]; then
@@ -34,5 +40,30 @@ jobs:
           fi
       - name: Process
         run: python -u subscribe/process.py -s subscribe/config.free.json --overwrite
+      - name: Upload quality report
+        if: always()
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          path = "data/quality_report.json"
+          if not os.path.exists(path):
+              print("no quality report, skip")
+              raise SystemExit(0)
+          with open(path, encoding="utf8") as f:
+              content = f.read()
+          req = urllib.request.Request(
+              "https://api.github.com/gists/752bc71fd89c75b288d0955e41ea4317",
+              data=json.dumps({"files": {"quality.json": {"content": content}}}).encode(),
+              headers={
+                  "Authorization": "token " + os.environ["PUSH_TOKEN"],
+                  "Accept": "application/vnd.github+json",
+                  "User-Agent": "aggregator-quality-report",
+              },
+              method="PATCH",
+          )
+          with urllib.request.urlopen(req, timeout=30) as resp:
+              print("quality report uploaded, HTTP", resp.status)
+          PY
       - name: Timestamp
         run: date
